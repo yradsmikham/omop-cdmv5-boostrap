@@ -89,8 +89,11 @@ resource "azurerm_mssql_database" "OHDSI-CDMV5" {
   }
 
   # import synpuf data
+  provisioner "local-exec" {
+        command = "../scripts/synpuf_data_import.sh ${var.prefix}-${var.environment}-omop-sql-server.database.windows.net ${var.prefix}-${var.environment}-omop-db omop_admin ${var.omop_password}"
+    }
+
   # add indices and primary keys
   # add foreign key constraints
-
 
 }

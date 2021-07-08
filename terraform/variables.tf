@@ -23,7 +23,7 @@ variable "omop_db_size" {
 
 variable "omop_db_sku" {
   type = string
-  default = "BC_Gen5_8"
+  default = "BC_Gen5_10"
 }
 
 variable "init_script_file" {

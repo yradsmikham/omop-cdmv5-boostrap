@@ -18,7 +18,7 @@ variable "omop_password" {
 
 variable "omop_db_size" {
   type = string
-  default = 10 # max size gb
+  default = 20 # max size gb
 }
 
 variable "omop_db_sku" {

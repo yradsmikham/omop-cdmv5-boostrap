@@ -24,8 +24,26 @@ This will help you get a simple OMOP CDM v5 up and running using Azure SQL Serve
 2. `terraform plan`
     - Provide a password for SQL Server `omop_admin`. (Must contain uppercase, lowercase, and special character.)
     - Provide a prefix name. For example "yvonne". (**Note**: this is not the same as environment name (i.e. `dev`)).
-3. `terraform plan`
+3. `terraform apply`
     - Provide similar input for `terraform plan`.
+    The execution of `terraform apply` can take about 20 minutes.
+
+## Troubleshooting:
+
+### Error: Error running command '../scripts/synpuf_data_import.sh test-dev-omop-sql-server.database.windows.net test-dev-omop-db omop_admin omop_password': exit status 126. Output: /bin/sh: ../scripts/synpuf_data_import.sh: Permission denied
+
+This could mean that the script has restricted access. You can change permissions by running:
+
+```
+chmod +x /scripts/synpuf_data_import.sh
+```
+
+You may be required to change permissions for the file `vocab_import.sh` as well.
+
+### Error: Msg 40544, Level 17, State 12, Line 1
+The database 'test-dev-omop-db' has reached its size quota. Partition or delete data, drop indexes, or consult the documentation for possible resolutions.
+
+This message is in regards to the `omop_db_size`. If you are having problems with performing SQL queries, you may need to increase the SQL database maximum storage size.
 
 ## Footnotes:
 

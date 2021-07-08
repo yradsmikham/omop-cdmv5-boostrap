@@ -2,7 +2,7 @@
 
 This will help you get a simple OMOP CDM v5 up and running using Azure SQL Server. The Terraform files will automate the creation of necessary resources (i.e. SQL Server, SQL database) and also execute OHDSI OMOP CDM v5 vocabulary and data import to get you started.
 
-## Prerequisites:
+## Prerequisites
 
 1. Install `sqlcmd`:
     - If on Mac:
@@ -18,7 +18,7 @@ This will help you get a simple OMOP CDM v5 up and running using Azure SQL Serve
 4. Download the CMD Vocabulary and move them into the `vocab/` directory of this repo. You can do this by visiting [Athena](https://athena.ohdsi.org/)
 5. If you would like to install the OMOP CDM with sample data from SynPuf, then unzip the `/synpuf_data/synpuf1k_omop_cdm_5.x.x.zip` and make sure the `synpuf_data_import.sh` in the `scripts/` directory is pointing to the unzipped version.
 
-## Run Terraform:
+## Run Terraform
 
 1. `terraform init`
 2. `terraform plan`
@@ -28,7 +28,7 @@ This will help you get a simple OMOP CDM v5 up and running using Azure SQL Serve
     - Provide similar input for `terraform plan`.
     The execution of `terraform apply` can take about 30-40 minutes.
 
-## Troubleshooting:
+## Troubleshooting
 
 ### Error: Error running command '../scripts/synpuf_data_import.sh test-dev-omop-sql-server.database.windows.net test-dev-omop-db omop_admin omop_password': exit status 126. Output: /bin/sh: ../scripts/synpuf_data_import.sh: Permission denied
 
@@ -44,7 +44,7 @@ You may be required to change permissions for the file `vocab_import.sh` as well
 
 This message is in regards to the `omop_db_size`. If you are having problems with performing SQL queries, you may need to increase the SQL database maximum storage size.
 
-## Footnotes:
+## Footnotes
 
 - [ ] Package WebAPI, Atlas, R, and Achilles
 - [ ] Implementation in Azure DevOps pipelines

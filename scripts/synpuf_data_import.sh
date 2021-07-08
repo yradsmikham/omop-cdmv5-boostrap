@@ -1,4 +1,4 @@
-FILES="../synpuf_data/synpuf1k_omop_cdm_5.3.1/*"
+FILES="../synpuf_data/synpuf1k_omop_cdm_5.3.1/*" # Change to this the appropriate directory name for data import
 for f in $FILES
 do
   short_f="$(basename -- $f)"

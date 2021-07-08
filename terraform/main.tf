@@ -75,7 +75,7 @@ resource "azurerm_mssql_database" "OHDSI-CDMV5" {
 
   # initialize database by creating tables and schemas
   provisioner "local-exec" {
-        command = "sqlcmd -U omop_admin -P ${var.omop_password} -S ${var.prefix}-${var.environment}-omop-sql-server.database.windows.net -d ${var.prefix}-${var.environment}-omop-db -i ${var.init_script_file} -o ${var.log_file}"
+        command = "sqlcmd -U omop_admin -P ${var.omop_password} -S ${var.prefix}-${var.environment}-omop-sql-server.database.windows.net -d ${var.prefix}-${var.environment}-omop-db -i ../SQL/OMOP_CDM_sql_server_ddl.sql -o ${var.log_file}"
     }
 
   # import cdm v5 vocabulary

@@ -46,6 +46,6 @@ This message is in regards to the `omop_db_size`. If you are having problems wit
 
 ## Footnotes
 
-- [ ] Package WebAPI, Atlas, R, and Achilles
+- [ ] Package Tomcat Server, WebAPI, Atlas, R, and Achilles
 - [ ] Implementation in Azure DevOps pipelines
 - [ ] ETL

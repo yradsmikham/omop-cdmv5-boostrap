@@ -30,3 +30,13 @@ variable log_file {
   description = "Log file name to create with the seeding results."
   default     = "db-init.log"
 }
+
+variable "docker_image" {
+  description = "Docker image for OHDSI WebAPI and Web tools"
+  default = "yradsmikham/ohdsi-webapi-and-webtools"
+}
+
+variable "docker_image_tag" {
+  description = "Docker image tag for OHDSI WebAPI and Web tools"
+  default = "latest"
+}

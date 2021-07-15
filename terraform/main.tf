@@ -103,3 +103,36 @@ resource "azurerm_mssql_database" "OHDSI-CDMV5" {
   }
 
 }
+
+# This creates the plan that the service use
+resource "azurerm_app_service_plan" "omop_asp" {
+  name                = "${var.prefix}-omop-asp"
+  location            = "${azurerm_resource_group.omop_rg.location}"
+  resource_group_name = "${azurerm_resource_group.omop_rg.name}"
+  kind                = "Linux"
+  reserved            = true
+
+  sku {
+    tier = "Standard"
+    size = "S1"
+  }
+}
+
+# This creates the service definition
+resource "azurerm_app_service" "omop_app_service" {
+  name                = "${var.prefix}-omop-appservice"
+  location            = "${azurerm_resource_group.omop_rg.location}"
+  resource_group_name = "${azurerm_resource_group.omop_rg.name}"
+  app_service_plan_id = "${azurerm_app_service_plan.omop_asp.id}"
+
+  site_config {
+    app_command_line = ""
+    linux_fx_version = "DOCKER|${var.docker_image}:${var.docker_image_tag}"
+    always_on        = true
+  }
+
+  app_settings = {
+    "WEBAPI_RELEASE" = "2.9.0"
+    "WEBAPI_WAR" =  "WebAPI-2.9.0.war"
+  }
+}

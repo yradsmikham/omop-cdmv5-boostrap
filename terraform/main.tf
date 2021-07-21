@@ -7,6 +7,8 @@ resource "azurerm_resource_group" "omop_rg" {
   location = var.omop_rg_location
 }
 
+/*
+
 resource "azurerm_storage_account" "omop_sa" {
   name                     = "${var.prefix}${var.environment}omopsa"
   resource_group_name      = azurerm_resource_group.omop_rg.name
@@ -34,6 +36,7 @@ resource "azurerm_storage_blob" "example" {
   type                   = "Block"
   source                 = "../synpuf_data/synpuf1k_omop_cdm_5.2.2.zip"
 }
+ */
 
 resource "azurerm_mssql_server" "omop_sql_server" {
   name                         = "${var.prefix}-${var.environment}-omop-sql-server"
@@ -134,5 +137,6 @@ resource "azurerm_app_service" "omop_app_service" {
   app_settings = {
     "WEBAPI_RELEASE" = "2.9.0"
     "WEBAPI_WAR" =  "WebAPI-2.9.0.war"
+    "WEBSITES_PORT" = "8080"
   }
 }

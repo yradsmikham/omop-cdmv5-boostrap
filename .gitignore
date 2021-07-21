@@ -4,3 +4,4 @@ terraform.tfstate*
 db-init.log
 synpuf1k_omop_cdm_5.3.1/
 synpuf1k_omop_cdm_5.2.2/
+.DS_Store

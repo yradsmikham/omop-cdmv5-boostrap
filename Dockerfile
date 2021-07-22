@@ -80,5 +80,9 @@ COPY config/config-gis.js /usr/local/tomcat/webapps/atlas/js/
 COPY scripts/deploy_script.sh /usr/local/tomcat/bin/
 RUN chmod +x /usr/local/tomcat/bin/deploy_script.sh
 
+# install the bash shell enable ssh script that supervisord will run whenever the container is started
+COPY scripts/enable_ssh.sh /usr/local/tomcat/bin/
+RUN chmod +x /usr/local/tomcat/bin/enable_ssh.sh
+
 # run supervisord to execute the deploy script (which also starts the tomcat server)
 CMD ["/usr/bin/supervisord"]

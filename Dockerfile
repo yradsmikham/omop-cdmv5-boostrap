@@ -4,10 +4,6 @@ FROM tomcat:9.0.46-jdk8-openjdk-buster
 
 # expose ports
 EXPOSE 8080
-EXPOSE 2222 80
-
-# include a proper sshd_config file in the /etc/ssh directory
-COPY config/sshd_config /etc/ssh/
 
 # set the WEBAPI_RELEASE environment variable within the Docker container
 ENV WEBAPI_RELEASE=2.9.0
@@ -26,11 +22,17 @@ RUN apt-get update && apt-get install -y --no-install-recommends \
     git-core \
     && rm -rf /var/lib/apt/lists/*
 
-# To ensure that openssh-server is installed, the following must be included in the Dockerfile used to build the image
+# Install OpenSSH and set the password for root to "Docker!". In this example, "apk add" is the install instruction for an Alpine Linux-based image.
 RUN export DEBIAN_FRONTEND=noninteractive \
 && apt-get update \
 && apt-get -y install --no-install-recommends openssh-server \
 && echo "root:Docker!" | chpasswd
+
+# Copy the sshd_config file to the /etc/ssh/ directory
+COPY config/sshd_config /etc/ssh/
+
+# Open port 2222 for SSH access
+EXPOSE 80 2222
 
 # install npm and upgrade it to the latest version
 WORKDIR ~

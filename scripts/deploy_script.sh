@@ -11,3 +11,4 @@ cp /tmp/drivers/*.jar /usr/local/tomcat/lib
 
 # start SSH service
 service ssh start
+/usr/sbin/sshd

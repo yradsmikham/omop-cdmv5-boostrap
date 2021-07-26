@@ -2,6 +2,9 @@ FROM tomcat:9.0.46-jdk8-openjdk-buster
 
 # OHDSI WebAPI and ATLAS web application running in Tomcat
 
+# expose ports
+EXPOSE 8080
+
 # set the WEBAPI_RELEASE environment variable within the Docker container
 ENV WEBAPI_RELEASE=2.9.0
 
@@ -18,6 +21,18 @@ RUN apt-get update && apt-get install -y --no-install-recommends \
     curl \
     git-core \
     && rm -rf /var/lib/apt/lists/*
+
+# Install OpenSSH and set the password for root to "Docker!". In this example, "apk add" is the install instruction for an Alpine Linux-based image.
+RUN export DEBIAN_FRONTEND=noninteractive \
+&& apt-get update \
+&& apt-get -y install --no-install-recommends openssh-server \
+&& echo "root:Docker!" | chpasswd
+
+# Copy the sshd_config file to the /etc/ssh/ directory
+COPY config/sshd_config /etc/ssh/
+
+# Open port 2222 for SSH access
+EXPOSE 80 2222
 
 # install npm and upgrade it to the latest version
 WORKDIR ~
@@ -64,6 +79,10 @@ COPY config/config-gis.js /usr/local/tomcat/webapps/atlas/js/
 # install the bash shell deploy script that supervisord will run whenever the container is started
 COPY scripts/deploy_script.sh /usr/local/tomcat/bin/
 RUN chmod +x /usr/local/tomcat/bin/deploy_script.sh
+
+# install the bash shell enable ssh script that supervisord will run whenever the container is started
+COPY scripts/enable_ssh.sh /usr/local/tomcat/bin/
+RUN chmod +x /usr/local/tomcat/bin/enable_ssh.sh
 
 # run supervisord to execute the deploy script (which also starts the tomcat server)
 CMD ["/usr/bin/supervisord"]

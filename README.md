@@ -76,6 +76,7 @@ If you have installed sqlcmd and bcp but you still run into a command not found 
 
 ## Footnotes
 
-- [ ] Package Tomcat Server, WebAPI, Atlas, R, and Achilles
+- [ ] Package Tomcat Server, WebAPI, Atlas - Docker(?)
+- [ ] R Server + Achilles
 - [ ] Implementation in Azure DevOps pipelines
 - [ ] ETL

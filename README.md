@@ -17,6 +17,32 @@ This will help you get a simple OMOP CDM v5 up and running using Azure SQL Serve
 3. Clone this repository.
 4. Download the CMD Vocabulary and move them into the `vocab/` directory of this repo. You can do this by visiting [Athena](https://athena.ohdsi.org/)
 5. If you would like to install the OMOP CDM with sample data from SynPuf, then unzip the `/synpuf_data/synpuf1k_omop_cdm_5.x.x.zip` and make sure the `synpuf_data_import.sh` in the `scripts/` directory is pointing to the unzipped version.
+6. Install Terraform version `v0.14.6` (or greater) locally
+
+## Azure Authentication and Subscription Selection
+
+Open a terminal, the first thing we need to do is log into our subscription. 
+
+```
+az login
+```
+Then we can list the subscriptions we have access to.
+```
+az account list -o table
+```
+
+Set you subscription appropriately.
+```
+az account set --subscription <your_subscription_id> 
+```
+
+## Set environment variables 
+
+You can either set your environment variables during runtime or leverage a tfvars file to prepopulate the values before the run. For this walk through we will use the 
+.tfvars file. 
+
+Take the [terraform.sample.tfvars](terraform/terraform.sample.tfvars), make a copy and rename it to `terraform.tfvars`. Terraform will automatically pick up these environment variables. Populate the values in the .tfvars file. 
+
 
 ## Run Terraform
 
@@ -43,6 +69,10 @@ You may be required to change permissions for the file `vocab_import.sh` as well
 ### Error: Msg 40544, Level 17, State 12, Line 1 The database 'test-dev-omop-db' has reached its size quota. Partition or delete data, drop indexes, or consult the documentation for possible resolutions.
 
 This message is in regards to the `omop_db_size`. If you are having problems with performing SQL queries, you may need to increase the SQL database maximum storage size.
+
+### Error: sqlcmd: command not found
+
+If you have installed sqlcmd and bcp but you still run into a command not found error it may be because you do not have a proper symlink created. See [this page](https://sqlserveronlinuxbackup.com/sqlcmd-command-not-found-ubuntu/) on how to fix this issue.
 
 ## Footnotes
 

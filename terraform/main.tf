@@ -46,7 +46,7 @@ resource "azurerm_mssql_server" "omop_sql_server" {
   administrator_login_password = var.omop_password
   minimum_tls_version          = "1.2"
   tags = {
-    environment = "dev"
+    environment = var.environment
   }
 }
 

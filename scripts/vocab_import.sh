@@ -1,5 +1,5 @@
-FILES="../vocab/*"
-for f in $FILES
+CSV_FILES="../vocab/*.csv"
+for f in $CSV_FILES
 do
   short_f="$(basename -- $f)"
   fname_next="${short_f%.*}"

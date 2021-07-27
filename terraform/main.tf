@@ -80,6 +80,10 @@ resource "azurerm_mssql_database" "OHDSI-CDMV5" {
   provisioner "local-exec" {
         command = "sqlcmd -U omop_admin -P ${var.omop_password} -S ${var.prefix}-${var.environment}-omop-sql-server.database.windows.net -d ${var.prefix}-${var.environment}-omop-db -i ../SQL/OMOP_CDM_sql_server_ddl.sql -o ${var.log_file}"
     }
+  # enable change data capture 
+  provisioner "local-exec" {
+        command = "sqlcmd -U omop_admin -P ${var.omop_password} -S ${var.prefix}-${var.environment}-omop-sql-server.database.windows.net -d ${var.prefix}-${var.environment}-omop-db -i ../SQL/enable_change_data.sql -o ${var.log_file}"
+  }
 
   # import cdm v5 vocabulary
   provisioner "local-exec" {

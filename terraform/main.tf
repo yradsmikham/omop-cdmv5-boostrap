@@ -7,7 +7,11 @@ resource "azurerm_resource_group" "omop_rg" {
   location = var.omop_rg_location
 }
 
-/*
+resource "local_file" "config-local" {
+  filename = var.config_local_path
+  content  = local.config-local
+}
+
 resource "azurerm_storage_account" "omop_sa" {
   name                     = "${var.prefix}${var.environment}omopsa"
   resource_group_name      = azurerm_resource_group.omop_rg.name
@@ -16,22 +20,32 @@ resource "azurerm_storage_account" "omop_sa" {
   account_replication_type = "LRS"
 }
 
-resource "azurerm_storage_container" "omop_container" {
-  name                  = "vocab-v5"
+resource "azurerm_storage_container" "atlas" {
+  name                  = "atlas"
   storage_account_name  = azurerm_storage_account.omop_sa.name
   container_access_type = "private"
 }
 
-resource "azurerm_storage_container" "data_container" {
+resource "azurerm_storage_blob" "atlas_config_local" {
+  name                   = "config-local.js"
+  storage_account_name   = azurerm_storage_account.omop_sa.name
+  storage_container_name = azurerm_storage_container.atlas.name
+  type                   = "Block"
+  source                 = "../config/config-local.js"
+}
+
+/*
+resource "azurerm_storage_container" "data" {
   name                  = "synpuf1k"
   storage_account_name  = azurerm_storage_account.omop_sa.name
   container_access_type = "private"
 }
 
+
 resource "azurerm_storage_blob" "example" {
   name                   = "synpuf1k_5.2.2.zip"
   storage_account_name   = azurerm_storage_account.omop_sa.name
-  storage_container_name = azurerm_storage_container.data_container.name
+  storage_container_name = azurerm_storage_container.data.name
   type                   = "Block"
   source                 = "../synpuf_data/synpuf1k_omop_cdm_5.2.2.zip"
 }
@@ -108,7 +122,7 @@ resource "azurerm_mssql_database" "OHDSI-CDMV5" {
 
 # This creates the plan that the service use
 resource "azurerm_app_service_plan" "omop_asp" {
-  name                = "${var.prefix}-omop-asp"
+  name                = "${var.prefix}-${var.environment}-omop-asp"
   location            = "${azurerm_resource_group.omop_rg.location}"
   resource_group_name = "${azurerm_resource_group.omop_rg.name}"
   kind                = "Linux"
@@ -122,7 +136,7 @@ resource "azurerm_app_service_plan" "omop_asp" {
 
 # This creates the service definition
 resource "azurerm_app_service" "omop_app_service" {
-  name                = "${var.prefix}-omop-appservice"
+  name                = "${var.prefix}-${var.environment}-omop-appservice"
   location            = "${azurerm_resource_group.omop_rg.location}"
   resource_group_name = "${azurerm_resource_group.omop_rg.name}"
   app_service_plan_id = "${azurerm_app_service_plan.omop_asp.id}"
@@ -137,7 +151,7 @@ resource "azurerm_app_service" "omop_app_service" {
     "WEBAPI_RELEASE" = "2.9.0"
     "WEBAPI_WAR" =  "WebAPI-2.9.0.war"
     "WEBSITES_PORT" = "8080"
-    "WEBAPI_URL" = "https://${var.prefix}-omop-appservice.azurewebsites.net:8080/"
+    "WEBAPI_URL" = "https://${var.prefix}-${var.environment}-omop-appservice.azurewebsites.net:8080/"
     "env" = "webapi-mssql"
     "security_origin" = "*"
     "datasource.driverClassName" = "com.microsoft.sqlserver.jdbc.SQLServerDriver"
@@ -150,11 +164,20 @@ resource "azurerm_app_service" "omop_app_service" {
     "spring.jpa.properties.hibernate.dialect" = "org.hibernate.dialect.SQLServer2012Dialect"
     "spring.batch.repository.tableprefix" = "${var.prefix}_${var.environment}_omop_db.ohdsi.BATCH_"
     "flyway.datasource.driverClassName" = "com.microsoft.sqlserver.jdbc.SQLServerDriver"
-    "flyway.datasource.url" = "jdbc:sqlserver://${var.prefix}-${var.environment}-omop-sql-server.windows.net:1433;database=${var.prefix}_${var.environment}_omop_db"
+    "flyway.datasource.url" = "jdbc:sqlserver://${var.prefix}-${var.environment}-omop-sql-server.database.windows.net:1433;database=${var.prefix}_${var.environment}_omop_db"
     "flyway.schemas" = "ohdsi"
     "flyway.placeholders.ohdsiSchema" = "ohdsi"
     "flyway.datasource.username" = "omop_admin"
     "flyway.datasource.password" = "${var.omop_password}"
     "flyway.locations" = "classpath:db/migration/sqlserver"
+  }
+
+  storage_account {
+    name = "${var.prefix}-${var.environment}-omop-sa-mount"
+    type = "AzureBlob"
+    account_name = "${var.prefix}${var.environment}omopsa"
+    share_name = "atlas"
+    access_key = azurerm_storage_account.omop_sa.primary_access_key
+    mount_path = "/usr/local/tomcat/webapps/atlas/js"
   }
 }

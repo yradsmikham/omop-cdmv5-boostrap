@@ -46,13 +46,51 @@
 					},
 					"ifTrueActivities": [
 						{
-							"name": "Wait1",
-							"type": "Wait",
+							"name": "IncrementalCopyActivity",
+							"type": "Copy",
 							"dependsOn": [],
+							"policy": {
+								"timeout": "7.00:00:00",
+								"retry": 0,
+								"retryIntervalInSeconds": 30,
+								"secureOutput": false,
+								"secureInput": false
+							},
 							"userProperties": [],
 							"typeProperties": {
-								"waitTimeInSeconds": 1
-							}
+								"source": {
+									"type": "AzureSqlSource",
+									"sqlReaderQuery": "DECLARE @from_lsn binary(10), @to_lsn binary(10);\n\nSET @from_lsn =sys.fn_cdc_get_min_lsn('dbo_dose_era');\n\nSET @to_lsn = sys.fn_cdc_map_time_to_lsn('largest less than or equal', GETDATE());\n\nSELECT * FROM cdc.fn_cdc_get_all_changes_dbo_dose_era(@from_lsn, @to_lsn, 'all')",
+									"queryTimeout": "02:00:00",
+									"partitionOption": "None"
+								},
+								"sink": {
+									"type": "AzureTableSink",
+									"azureTableInsertType": "merge",
+									"writeBatchSize": 10000
+								},
+								"enableStaging": false,
+								"translator": {
+									"type": "TabularTranslator",
+									"typeConversion": true,
+									"typeConversionSettings": {
+										"allowDataTruncation": true,
+										"treatBooleanAsNumber": false
+									}
+								}
+							},
+							"inputs": [
+								{
+									"referenceName": "dbo_dose_era_CT",
+									"type": "DatasetReference"
+								}
+							],
+							"outputs": [
+								{
+									"referenceName": "archived_dose_era_CT",
+									"type": "DatasetReference"
+								}
+							]
 						}
 					]
 				}

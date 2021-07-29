@@ -1,0 +1,76 @@
+{
+	"name": "dbo_dose_era_CT",
+	"properties": {
+		"linkedServiceName": {
+			"referenceName": "AzureSqlDatabase1",
+			"type": "LinkedServiceReference"
+		},
+		"annotations": [],
+		"type": "AzureSqlTable",
+		"schema": [
+			{
+				"name": "__$start_lsn",
+				"type": "binary"
+			},
+			{
+				"name": "__$end_lsn",
+				"type": "binary"
+			},
+			{
+				"name": "__$seqval",
+				"type": "binary"
+			},
+			{
+				"name": "__$operation",
+				"type": "int",
+				"precision": 10
+			},
+			{
+				"name": "__$update_mask",
+				"type": "varbinary"
+			},
+			{
+				"name": "dose_era_id",
+				"type": "int",
+				"precision": 10
+			},
+			{
+				"name": "person_id",
+				"type": "int",
+				"precision": 10
+			},
+			{
+				"name": "drug_concept_id",
+				"type": "int",
+				"precision": 10
+			},
+			{
+				"name": "unit_concept_id",
+				"type": "int",
+				"precision": 10
+			},
+			{
+				"name": "dose_value",
+				"type": "float",
+				"precision": 15
+			},
+			{
+				"name": "dose_era_start_date",
+				"type": "date"
+			},
+			{
+				"name": "dose_era_end_date",
+				"type": "date"
+			},
+			{
+				"name": "__$command_id",
+				"type": "int",
+				"precision": 10
+			}
+		],
+		"typeProperties": {
+			"schema": "cdc",
+			"table": "dbo_dose_era_CT"
+		}
+	}
+}

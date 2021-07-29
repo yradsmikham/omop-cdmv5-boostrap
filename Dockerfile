@@ -76,6 +76,10 @@ COPY config/config-local.js /usr/local/tomcat/webapps/atlas/js/
 # install Atlas GIS local configuration file
 COPY config/config-gis.js /usr/local/tomcat/webapps/atlas/js/
 
+# overwrite Atlas configurations with mounted volume
+COPY scripts/copy_atlas_config.sh /usr/local/tomcat/bin/
+RUN chmod +x /usr/local/tomcat/bin/copy_atlas_config.sh
+
 # install the bash shell deploy script that supervisord will run whenever the container is started
 COPY scripts/deploy_script.sh /usr/local/tomcat/bin/
 RUN chmod +x /usr/local/tomcat/bin/deploy_script.sh

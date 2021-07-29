@@ -1,6 +1,6 @@
 # OMOP CDM v5 Bootstrap
 
-This will help you get a simple OMOP CDM v5 up and running using Azure SQL Server. The Terraform files will automate the creation of necessary resources (i.e. SQL Server, SQL database) and also execute OHDSI OMOP CDM v5 vocabulary and data import to get you started.
+This will help you get a simple OMOP CDM v5 up and running using Azure SQL Server. The Terraform files will automate the creation of necessary resources (i.e. SQL Server, SQL database) to stand up an OHDSI OMOP CDM v5, and also _optionally_ import a vocabulary and/or data to get you started.
 
 ## Prerequisites
 
@@ -15,13 +15,13 @@ This will help you get a simple OMOP CDM v5 up and running using Azure SQL Serve
     - If on Windows, visit [here](https://docs.microsoft.com/en-us/sql/tools/sqlcmd-utility?view=sql-server-ver15)
 2. Install `bcp`. If you followed the instructions from Step 1, you may skip this step.
 3. Clone this repository.
-4. Download the CMD Vocabulary and move them into the `vocab/` directory of this repo. You can do this by visiting [Athena](https://athena.ohdsi.org/)
+4. Download the CMD Vocabulary and move them into the `vocab/` directory of this repo. You can do this by visiting [Athena](https://athena.ohdsi.org/).
 5. If you would like to install the OMOP CDM with sample data from SynPuf, then unzip the `/synpuf_data/synpuf1k_omop_cdm_5.x.x.zip` and make sure the `synpuf_data_import.sh` in the `scripts/` directory is pointing to the unzipped version.
 6. Install Terraform version `v0.14.6` (or greater) locally
 
 ## Azure Authentication and Subscription Selection
 
-Open a terminal, the first thing we need to do is log into our subscription. 
+Open a terminal, the first thing we need to do is log into our subscription.
 
 ```
 az login
@@ -33,16 +33,15 @@ az account list -o table
 
 Set you subscription appropriately.
 ```
-az account set --subscription <your_subscription_id> 
+az account set --subscription <your_subscription_id>
 ```
 
-## Set environment variables 
+## Set environment variables
 
-You can either set your environment variables during runtime or leverage a tfvars file to prepopulate the values before the run. For this walk through we will use the 
-.tfvars file. 
+You can either set your environment variables during runtime or leverage a tfvars file to prepopulate the values before the run. For this walk through we will use the
+.tfvars file.
 
-Take the [terraform.sample.tfvars](terraform/terraform.sample.tfvars), make a copy and rename it to `terraform.tfvars`. Terraform will automatically pick up these environment variables. Populate the values in the .tfvars file. 
-
+Take the [terraform.sample.tfvars](terraform/terraform.sample.tfvars), make a copy and rename it to `terraform.tfvars`. Terraform will automatically pick up these environment variables. Populate the values in the .tfvars file.
 
 ## Run Terraform
 
@@ -50,9 +49,19 @@ Take the [terraform.sample.tfvars](terraform/terraform.sample.tfvars), make a co
 2. `terraform plan`
     - Provide a password for SQL Server `omop_admin`. (Must contain uppercase, lowercase, and special character.)
     - Provide a prefix name. For example "yvonne". (**Note**: this is not the same as environment name (i.e. `dev`)).
+    - This could also be done using a `.tfvars` file.
 3. `terraform apply`
-    - Provide similar input for `terraform plan`.
-    The execution of `terraform apply` can take about 30-40 minutes.
+    - Provide similar input for `terraform plan` if not using a `.tfvars` file..
+
+**DISCLAIMER**: The execution of `terraform apply` can take about 45-60 minutes if importing the vocabulary set due to the size of the vocabulary csv files, which are often a total of a few gigabytes.
+
+## Vocabulary and Data Import
+
+You can also import the vocabulary outside of Terraform, which can drastically improve infrastructure deployment time. This is the recommended approach in case Terraform deployment errors out, and in which case, the state of the Terraform resource(s) may become "tainted". It may be challenging to resume the dedployment when this occurs, and you may need to start over (i.e. perform a terraform destroy and reapply).
+
+To run the vocabulary manually, use the script `vocab_import.sh` in the `\scripts` directory. You may need to modify the path to `CSV_FILES` to point to the path of your vocabulary csv files.
+
+The same can be done for importing data. Instead, refer to the `synpuf_data_import.sh` script.
 
 ## Troubleshooting
 
@@ -76,7 +85,7 @@ If you have installed sqlcmd and bcp but you still run into a command not found 
 
 ## Footnotes
 
-- [ ] Package Tomcat Server, WebAPI, Atlas - Docker(?)
+- [x] Package Tomcat Server, WebAPI, Atlas - Deploying docker container in Azure App Service
 - [ ] R Server + Achilles
-- [ ] Implementation in Azure DevOps pipelines
+- [ ] Implementation of CI/CD in Azure DevOps pipelines or Github Actions to build more custom Docker images (?)
 - [ ] ETL

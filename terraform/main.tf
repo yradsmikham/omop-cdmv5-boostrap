@@ -12,6 +12,11 @@ resource "local_file" "config-local" {
   content  = local.config-local
 }
 
+resource "local_file" "config-gis" {
+  filename = var.config_gis_path
+  content  = local.config-gis
+}
+
 resource "azurerm_storage_account" "omop_sa" {
   name                     = "${var.prefix}${var.environment}omopsa"
   resource_group_name      = azurerm_resource_group.omop_rg.name
@@ -34,13 +39,20 @@ resource "azurerm_storage_blob" "atlas_config_local" {
   source                 = "../config/config-local.js"
 }
 
+resource "azurerm_storage_blob" "atlas_config_gis" {
+  name                   = "config-gis.js"
+  storage_account_name   = azurerm_storage_account.omop_sa.name
+  storage_container_name = azurerm_storage_container.atlas.name
+  type                   = "Block"
+  source                 = "../config/config-gis.js"
+}
+
 /*
 resource "azurerm_storage_container" "data" {
   name                  = "synpuf1k"
   storage_account_name  = azurerm_storage_account.omop_sa.name
   container_access_type = "private"
 }
-
 
 resource "azurerm_storage_blob" "example" {
   name                   = "synpuf1k_5.2.2.zip"
@@ -95,9 +107,9 @@ resource "azurerm_mssql_database" "OHDSI-CDMV5" {
     }
 
   # import cdm v5 vocabulary
-  provisioner "local-exec" {
-        command = "../scripts/vocab_import.sh ${var.prefix}-${var.environment}-omop-sql-server.database.windows.net ${var.prefix}_${var.environment}_omop_db omop_admin ${var.omop_password}"
-    }
+  #provisioner "local-exec" {
+  #      command = "../scripts/vocab_import.sh ${var.prefix}-${var.environment}-omop-sql-server.database.windows.net ${var.prefix}_${var.environment}_omop_db omop_admin ${var.omop_password}"
+  #  }
 
   # convert vocabulary table columns from varchar to date
   provisioner "local-exec" {
@@ -105,9 +117,9 @@ resource "azurerm_mssql_database" "OHDSI-CDMV5" {
   }
 
   # import synpuf data
-  provisioner "local-exec" {
-        command = "../scripts/synpuf_data_import.sh ${var.prefix}-${var.environment}-omop-sql-server.database.windows.net ${var.prefix}_${var.environment}_omop_db omop_admin ${var.omop_password}"
-    }
+  #provisioner "local-exec" {
+  #      command = "../scripts/synpuf_data_import.sh ${var.prefix}-${var.environment}-omop-sql-server.database.windows.net ${var.prefix}_${var.environment}_omop_db omop_admin ${var.omop_password}"
+  #  }
 
   # add indices and primary keys
   provisioner "local-exec" {
@@ -151,6 +163,7 @@ resource "azurerm_app_service" "omop_app_service" {
     "WEBAPI_RELEASE" = "2.9.0"
     "WEBAPI_WAR" =  "WebAPI-2.9.0.war"
     "WEBSITES_PORT" = "8080"
+    "WEBSITES_CONTAINER_START_TIME_LIMIT" = "1800"
     "WEBAPI_URL" = "https://${var.prefix}-${var.environment}-omop-appservice.azurewebsites.net:8080/"
     "env" = "webapi-mssql"
     "security_origin" = "*"
@@ -178,6 +191,10 @@ resource "azurerm_app_service" "omop_app_service" {
     account_name = "${var.prefix}${var.environment}omopsa"
     share_name = "atlas"
     access_key = azurerm_storage_account.omop_sa.primary_access_key
-    mount_path = "/usr/local/tomcat/webapps/atlas/js"
+    mount_path = "/usr/local/tomcat/webapps/atlas/js/tf_config"
   }
+
+  depends_on = [
+    azurerm_storage_container.atlas
+  ]
 }

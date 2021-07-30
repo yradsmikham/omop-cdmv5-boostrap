@@ -1,10 +1,6 @@
 {
 	"name": "archived_dose_era_CT",
 	"properties": {
-		"linkedServiceName": {
-			"referenceName": "AzureTableStorage1",
-			"type": "LinkedServiceReference"
-		},
 		"annotations": [],
 		"type": "AzureTable",
 		"schema": [],

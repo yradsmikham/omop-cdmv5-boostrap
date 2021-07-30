@@ -1,5 +1,5 @@
 {
-	"name": "IncrementalCopyPipeline",
+	"name": "IncrementalChangeDataCopyPipeline",
 	"properties": {
 		"activities": [
 			{

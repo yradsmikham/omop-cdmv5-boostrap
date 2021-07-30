@@ -65,9 +65,15 @@
 									"partitionOption": "None"
 								},
 								"sink": {
-									"type": "AzureTableSink",
-									"azureTableInsertType": "merge",
-									"writeBatchSize": 10000
+									"type": "DelimitedTextSink",
+									"storeSettings": {
+										"type": "AzureBlobStorageWriteSettings"
+									},
+									"formatSettings": {
+										"type": "DelimitedTextWriteSettings",
+										"quoteAllText": true,
+										"fileExtension": ".txt"
+									}
 								},
 								"enableStaging": false,
 								"translator": {

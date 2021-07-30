@@ -2,9 +2,66 @@ provider "azurerm" {
   features {}
 }
 
+data "azurerm_client_config" "current" {}
+
 resource "azurerm_resource_group" "omop_rg" {
   name     = "${var.prefix}-${var.environment}-omop-rg"
   location = var.omop_rg_location
+}
+
+resource "azurerm_key_vault" "app_service_settings" {
+  name                       = "${var.prefix}-${var.environment}-omop-kv"
+  location                   = azurerm_resource_group.omop_rg.location
+  resource_group_name        = azurerm_resource_group.omop_rg.name
+  tenant_id                  = data.azurerm_client_config.current.tenant_id
+  sku_name                   = "premium"
+  soft_delete_retention_days = 7
+
+  access_policy {
+    tenant_id = data.azurerm_client_config.current.tenant_id
+    object_id = data.azurerm_client_config.current.object_id
+
+    key_permissions = [
+      "create",
+      "get",
+      "list",
+    ]
+
+    secret_permissions = [
+      "list",
+      "set",
+      "get",
+      "delete",
+      "purge",
+      "recover",
+    ]
+  }
+}
+
+resource "azurerm_key_vault_secret" "url" {
+  name         = "datasource-url"
+  value        = "jdbc:sqlserver://${var.prefix}-${var.environment}-omop-sql-server.database.windows.net:1433;database=${var.prefix}_${var.environment}_omop_db"
+  key_vault_id = azurerm_key_vault.app_service_settings.id
+}
+
+resource "azurerm_key_vault_secret" "password" {
+  name         = "omop-password"
+  value        = "${var.omop_password}"
+  key_vault_id = azurerm_key_vault.app_service_settings.id
+}
+
+resource "azurerm_key_vault_access_policy" "app_service_kv" {
+  key_vault_id = azurerm_key_vault.app_service_settings.id
+  tenant_id    = azurerm_app_service.omop_app_service.identity.0.tenant_id
+  object_id    = azurerm_app_service.omop_app_service.identity.0.principal_id
+
+  key_permissions = [
+    "Get",
+  ]
+
+  secret_permissions = [
+    "Get",
+  ]
 }
 
 resource "local_file" "config-local" {
@@ -104,12 +161,12 @@ resource "azurerm_mssql_database" "OHDSI-CDMV5" {
   # initialize database by creating tables and schemas
   provisioner "local-exec" {
         command = "sqlcmd -U omop_admin -P ${var.omop_password} -S ${var.prefix}-${var.environment}-omop-sql-server.database.windows.net -d ${var.prefix}_${var.environment}_omop_db -i ../SQL/OMOP_CDM_sql_server_ddl.sql -o ${var.log_file}"
-    }
+  }
 
   # import cdm v5 vocabulary
   #provisioner "local-exec" {
   #      command = "../scripts/vocab_import.sh ${var.prefix}-${var.environment}-omop-sql-server.database.windows.net ${var.prefix}_${var.environment}_omop_db omop_admin ${var.omop_password}"
-  #  }
+  #}
 
   # convert vocabulary table columns from varchar to date
   provisioner "local-exec" {
@@ -119,17 +176,17 @@ resource "azurerm_mssql_database" "OHDSI-CDMV5" {
   # import synpuf data
   #provisioner "local-exec" {
   #      command = "../scripts/synpuf_data_import.sh ${var.prefix}-${var.environment}-omop-sql-server.database.windows.net ${var.prefix}_${var.environment}_omop_db omop_admin ${var.omop_password}"
-  #  }
+  #}
 
   # add indices and primary keys
   provisioner "local-exec" {
       command = "sqlcmd -U omop_admin -P ${var.omop_password} -S ${var.prefix}-${var.environment}-omop-sql-server.database.windows.net -d ${var.prefix}_${var.environment}_omop_db -i ../SQL/OMOP_CDM_sql_server_indexes.sql -o ${var.log_file}"
   }
+
   # add foreign key constraints
   provisioner "local-exec" {
       command = "sqlcmd -U omop_admin -P ${var.omop_password} -S ${var.prefix}-${var.environment}-omop-sql-server.database.windows.net -d ${var.prefix}_${var.environment}_omop_db -i ../SQL/OMOP_CDM_sql_server_constraints.sql -o ${var.log_file}"
   }
-
 }
 
 # This creates the plan that the service use
@@ -168,20 +225,20 @@ resource "azurerm_app_service" "omop_app_service" {
     "env" = "webapi-mssql"
     "security_origin" = "*"
     "datasource.driverClassName" = "com.microsoft.sqlserver.jdbc.SQLServerDriver"
-    "datasource.url" = "jdbc:sqlserver://${var.prefix}-${var.environment}-omop-sql-server.database.windows.net:1433;database=${var.prefix}_${var.environment}_omop_db"
+    "datasource.url" = "@Microsoft.KeyVault(VaultName=${var.prefix}-${var.environment}-omop-kv;SecretName=datasource-url;SecretVersion=${azurerm_key_vault_secret.url.version})"
     "datasource.cdm.schema" = "cdm"
     "datasource.ohdsi.schema" = "webapi"
     "datasource.username" = "omop_admin"
-    "datasource.password" = "${var.omop_password}"
+    "datasource.password" = "@Microsoft.KeyVault(VaultName=${var.prefix}-${var.environment}-omop-kv;SecretName=omop-password;SecretVersion=${azurerm_key_vault_secret.password.version})"
     "spring.jpa.properties.hibernate.default_schema" = "webapi"
     "spring.jpa.properties.hibernate.dialect" = "org.hibernate.dialect.SQLServer2012Dialect"
     "spring.batch.repository.tableprefix" = "${var.prefix}_${var.environment}_omop_db.webapi.BATCH_"
     "flyway.datasource.driverClassName" = "com.microsoft.sqlserver.jdbc.SQLServerDriver"
-    "flyway.datasource.url" = "jdbc:sqlserver://${var.prefix}-${var.environment}-omop-sql-server.database.windows.net:1433;database=${var.prefix}_${var.environment}_omop_db"
+    "flyway.datasource.url" = "@Microsoft.KeyVault(VaultName=${var.prefix}-${var.environment}-omop-kv;SecretName=datasource-url;SecretVersion=${azurerm_key_vault_secret.url.version})"
     "flyway.schemas" = "webapi"
     "flyway.placeholders.ohdsiSchema" = "webapi"
     "flyway.datasource.username" = "omop_admin"
-    "flyway.datasource.password" = "${var.omop_password}"
+    "flyway.datasource.password" = "@Microsoft.KeyVault(VaultName=${var.prefix}-${var.environment}-omop-kv;SecretName=omop-password;SecretVersion=${azurerm_key_vault_secret.password.version})"
     "flyway.locations" = "classpath:db/migration/sqlserver"
   }
 
@@ -192,6 +249,10 @@ resource "azurerm_app_service" "omop_app_service" {
     share_name = "atlas"
     access_key = azurerm_storage_account.omop_sa.primary_access_key
     mount_path = "/usr/local/tomcat/webapps/atlas/js/tf_config"
+  }
+
+  identity {
+    type = "SystemAssigned"
   }
 
   depends_on = [

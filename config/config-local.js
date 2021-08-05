@@ -1,15 +1,21 @@
 define([], function () {
-	var configLocal = {};
+  var configLocal = {};
 
-	// WebAPI
-	configLocal.api = {
-		name: 'OHDSI',
-		url: 'https://localhost:8080/WebAPI/'
-	};
+  // clearing local storage otherwise source cache will obscure the override settings
+  localStorage.clear();
 
-	configLocal.cohortComparisonResultsEnabled = false;
-	configLocal.userAuthenticationEnabled = false;
-	configLocal.plpResultsEnabled = false;
+  var getUrl = window.location;
+  var baseUrl = getUrl.protocol + "//" + getUrl.host;
 
-	return configLocal;
+  // WebAPI
+  configLocal.api = {
+    name: 'OHDSI',
+    url: baseUrl + '/WebAPI/'
+  };
+
+  configLocal.cohortComparisonResultsEnabled = false;
+  configLocal.userAuthenticationEnabled = false;
+  configLocal.plpResultsEnabled = false;
+
+  return configLocal;
 });

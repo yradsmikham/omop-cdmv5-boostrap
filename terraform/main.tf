@@ -64,14 +64,9 @@ resource "azurerm_key_vault_access_policy" "app_service_kv" {
   ]
 }
 
-resource "local_file" "config-local" {
-  filename = var.config_local_path
-  content  = local.config-local
-}
-
-resource "local_file" "config-gis" {
-  filename = var.config_gis_path
-  content  = local.config-gis
+resource "local_file" "source-source-daimon" {
+  filename = var.source_source_daimon_path
+  content  = local.source-source-daimon
 }
 
 resource "azurerm_storage_account" "omop_sa" {
@@ -88,20 +83,12 @@ resource "azurerm_storage_container" "atlas" {
   container_access_type = "private"
 }
 
-resource "azurerm_storage_blob" "atlas_config_local" {
-  name                   = "config-local.js"
+resource "azurerm_storage_blob" "source_source_daimon" {
+  name                   = "source_source_daimon.sql"
   storage_account_name   = azurerm_storage_account.omop_sa.name
   storage_container_name = azurerm_storage_container.atlas.name
   type                   = "Block"
-  source                 = "../config/config-local.js"
-}
-
-resource "azurerm_storage_blob" "atlas_config_gis" {
-  name                   = "config-gis.js"
-  storage_account_name   = azurerm_storage_account.omop_sa.name
-  storage_container_name = azurerm_storage_container.atlas.name
-  type                   = "Block"
-  source                 = "../config/config-gis.js"
+  source                 = "../sql/source_source_daimon.sql"
 }
 
 /*
@@ -222,6 +209,10 @@ resource "azurerm_app_service" "omop_app_service" {
     "WEBSITES_PORT" = "8080"
     "WEBSITES_CONTAINER_START_TIME_LIMIT" = "1800"
     "WEBAPI_URL" = "https://${var.prefix}-${var.environment}-omop-appservice.azurewebsites.net:8080/"
+    "SQL_SERVER_NAME" = "${var.prefix}-${var.environment}-omop-sql-server.database.windows.net"
+    "SQL_DB_NAME" = "${var.prefix}_${var.environment}_omop_db"
+    "WEBAPI_SOURCES" = "https://${var.prefix}-${var.environment}-omop-appservice.azurewebsites.net/WebAPI/source"
+    "OMOP_PASSWORD" = "@Microsoft.KeyVault(VaultName=${var.prefix}-${var.environment}-omop-kv;SecretName=omop-password;SecretVersion=${azurerm_key_vault_secret.password.version})"
     "env" = "webapi-mssql"
     "security_origin" = "*"
     "datasource.driverClassName" = "com.microsoft.sqlserver.jdbc.SQLServerDriver"

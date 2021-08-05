@@ -51,25 +51,9 @@ Take the [terraform.sample.tfvars](terraform/terraform.sample.tfvars), make a co
     - Provide a prefix name. For example "yvonne". (**Note**: this is not the same as environment name (i.e. `dev`)).
     - This could also be done using a `.tfvars` file.
 3. `terraform apply`
-    - Provide similar input for `terraform plan` if not using a `.tfvars` file..
+    - Provide similar input for `terraform plan` if not using a `.tfvars` file.
 
 **DISCLAIMER**: The execution of `terraform apply` can take about 45-60 minutes if importing the vocabulary set due to the size of the vocabulary csv files, which are often a total of a few gigabytes.
-
-## WebAPI Configuration
-
-Once your Terraform deployment is completed and you can access Atlas via browser at `http://<environment>.azurewebsites.net/atlas`, you may run into the following error:
-
-![Atlas Configuration](./docs/assets/atlas_config.png)
-
-From here, you will need to configure your CDM sources. You can do that by using a database tool like [Azure Data Studio](https://docs.microsoft.com/en-us/sql/azure-data-studio/download-azure-data-studio?view=sql-server-ver15). Then,
-
-1. Connect to your Azure SQL Server and SQL Database created by Terraform.
-2. Modify the `source_source_daimon.sql` from the `/sql` directory to use the correct jdbc connection string.
-3. Run the `source_source_daimon.sql` as a query.
-4. In the browser, navigate to `http://<environment>.azurewebsites.net/WebAPI/resource/refresh` to update your sources.
-5. Return to `http://<environment>.azurewebsites.net/atlas`. Under the "Configuration" tab, you should be able to see your CDM sources updated now.
-
-![Atlas Configuration](./docs/assets/atlas_config_2.png)
 
 ## Vocabulary and Data Import
 

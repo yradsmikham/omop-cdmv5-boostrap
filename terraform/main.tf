@@ -147,7 +147,7 @@ resource "azurerm_mssql_database" "OHDSI-CDMV5" {
 
   # initialize database by creating tables and schemas
   provisioner "local-exec" {
-        command = "sqlcmd -U omop_admin -P ${var.omop_password} -S ${var.prefix}-${var.environment}-omop-sql-server.database.windows.net -d ${var.prefix}_${var.environment}_omop_db -i ../SQL/OMOP_CDM_sql_server_ddl.sql -o ${var.log_file}"
+        command = "sqlcmd -U omop_admin -P ${var.omop_password} -S ${var.prefix}-${var.environment}-omop-sql-server.database.windows.net -d ${var.prefix}_${var.environment}_omop_db -i '../sql/OMOP_CDM_sql_server_ddl.sql' -o ${var.log_file}"
   }
 
   # import cdm v5 vocabulary
@@ -157,7 +157,7 @@ resource "azurerm_mssql_database" "OHDSI-CDMV5" {
 
   # convert vocabulary table columns from varchar to date
   provisioner "local-exec" {
-      command = "sqlcmd -U omop_admin -P ${var.omop_password} -S ${var.prefix}-${var.environment}-omop-sql-server.database.windows.net -d ${var.prefix}_${var.environment}_omop_db -i ../SQL/convert_varchar_to_date.sql -o ${var.log_file}"
+      command = "sqlcmd -U omop_admin -P ${var.omop_password} -S ${var.prefix}-${var.environment}-omop-sql-server.database.windows.net -d ${var.prefix}_${var.environment}_omop_db -i '../sql/convert_varchar_to_date.sql' -o ${var.log_file}"
   }
 
   # import synpuf data
@@ -167,13 +167,16 @@ resource "azurerm_mssql_database" "OHDSI-CDMV5" {
 
   # add indices and primary keys
   provisioner "local-exec" {
-      command = "sqlcmd -U omop_admin -P ${var.omop_password} -S ${var.prefix}-${var.environment}-omop-sql-server.database.windows.net -d ${var.prefix}_${var.environment}_omop_db -i ../SQL/OMOP_CDM_sql_server_indexes.sql -o ${var.log_file}"
+      command = "sqlcmd -U omop_admin -P ${var.omop_password} -S ${var.prefix}-${var.environment}-omop-sql-server.database.windows.net -d ${var.prefix}_${var.environment}_omop_db -i .'./sql/OMOP_CDM_sql_server_indexes.sql' -o ${var.log_file}"
   }
 
   # add foreign key constraints
   provisioner "local-exec" {
-      command = "sqlcmd -U omop_admin -P ${var.omop_password} -S ${var.prefix}-${var.environment}-omop-sql-server.database.windows.net -d ${var.prefix}_${var.environment}_omop_db -i ../SQL/OMOP_CDM_sql_server_constraints.sql -o ${var.log_file}"
+      command = "sqlcmd -U omop_admin -P ${var.omop_password} -S ${var.prefix}-${var.environment}-omop-sql-server.database.windows.net -d ${var.prefix}_${var.environment}_omop_db -i '../sql/OMOP_CDM_sql_server_constraints.sql' -o ${var.log_file}"
   }
+  depends_on = [
+    azurerm_mssql_server.omop_sql_server
+  ]
 }
 
 # This creates the plan that the service use
@@ -199,7 +202,8 @@ resource "azurerm_app_service" "omop_app_service" {
 
   site_config {
     app_command_line = ""
-    linux_fx_version = "DOCKER|${var.docker_image}:${var.docker_image_tag}"
+    linux_fx_version = "COMPOSE|${filebase64("compose.yml")}"
+    #linux_fx_version = "DOCKER|${var.docker_image}:${var.docker_image_tag}"
     always_on        = true
   }
 

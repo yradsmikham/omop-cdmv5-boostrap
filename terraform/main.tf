@@ -52,8 +52,8 @@ resource "azurerm_key_vault_secret" "password" {
 
 resource "azurerm_key_vault_access_policy" "app_service_kv" {
   key_vault_id = azurerm_key_vault.app_service_settings.id
-  tenant_id    = azurerm_app_service.omop_app_service.identity.0.tenant_id
-  object_id    = azurerm_app_service.omop_app_service.identity.0.principal_id
+  tenant_id    = azurerm_app_service.omop_broadsea.identity.0.tenant_id
+  object_id    = azurerm_app_service.omop_broadsea.identity.0.principal_id
 
   key_permissions = [
     "Get",
@@ -190,17 +190,16 @@ resource "azurerm_app_service_plan" "omop_asp" {
   }
 }
 
-# This creates the service definition
-resource "azurerm_app_service" "omop_app_service" {
-  name                = "${var.prefix}-${var.environment}-omop-appservice"
+# This creates the Broadsea app service definition
+resource "azurerm_app_service" "omop_broadsea" {
+  name                = "${var.prefix}-${var.environment}-omop-broadsea"
   location            = "${azurerm_resource_group.omop_rg.location}"
   resource_group_name = "${azurerm_resource_group.omop_rg.name}"
   app_service_plan_id = "${azurerm_app_service_plan.omop_asp.id}"
 
   site_config {
     app_command_line = ""
-    linux_fx_version = "COMPOSE|${filebase64("compose.yml")}"
-    #linux_fx_version = "DOCKER|${var.docker_image}:${var.docker_image_tag}"
+    linux_fx_version = "DOCKER|${var.broadsea_image}:${var.broadsea_image_tag}"
     always_on        = true
   }
 
@@ -250,4 +249,27 @@ resource "azurerm_app_service" "omop_app_service" {
   depends_on = [
     azurerm_storage_container.atlas
   ]
+}
+
+# This creates the Broadsea app service definition
+resource "azurerm_app_service" "omop_webtools" {
+  name                = "${var.prefix}-${var.environment}-omop-webtools"
+  location            = "${azurerm_resource_group.omop_rg.location}"
+  resource_group_name = "${azurerm_resource_group.omop_rg.name}"
+  app_service_plan_id = "${azurerm_app_service_plan.omop_asp.id}"
+
+  site_config {
+    app_command_line = ""
+    linux_fx_version = "DOCKER|${var.webtools_image}:${var.webtools_image_tag}"
+    always_on        = true
+  }
+
+  app_settings = {
+    "USER" = "${var.webtools_user}"
+    "PASSWORD" =  "${var.webtools_password}"
+  }
+
+  identity {
+    type = "SystemAssigned"
+  }
 }

@@ -58,12 +58,32 @@ variable log_file {
   default     = "db-init.log"
 }
 
-variable "docker_image" {
-  description = "Docker image for OHDSI WebAPI and Web tools"
+variable "broadsea_image" {
+  description = "Docker image for OHDSI - Broadsea (Atlas and WebAPI)"
   default = "yradsmikham/ohdsi-webapi-and-webtools"
 }
 
-variable "docker_image_tag" {
-  description = "Docker image tag for OHDSI WebAPI and Web tools"
+variable "broadsea_image_tag" {
+  description = "Docker image tag for OHDSI - Broadsea (Atlas and WebAPI)"
   default = "latest"
+}
+
+variable "webtools_image" {
+  description = "Docker image for OHDSI - Webtools (Achilles)"
+  default = "ohdsi/broadsea-methodslibrary"
+}
+
+variable "webtools_image_tag" {
+  description = "Docker image tag for OHDSI - Webtools (Achilles)"
+  default = "latest"
+}
+
+variable "webtools_user" {
+  description = "Achilles user"
+  default = "ohdsi"
+}
+
+variable "webtools_password" {
+  description = "Achilles password"
+  default = "ohdsi"
 }

@@ -1,6 +1,6 @@
 # OMOP CDM v5 Bootstrap
 
-This will help you get a simple OMOP CDM v5 up and running using Azure SQL Server. The Terraform files will automate the creation of necessary resources (i.e. SQL Server, SQL database) to stand up an OHDSI OMOP CDM v5, and also _optionally_ import a vocabulary and/or data to get you started.
+This will help you get a simple OMOP CDM v5 up and running using Azure SQL Server. The Terraform files will automate the creation of necessary resources (i.e. SQL Server, SQL database) to stand up an OHDSI OMOP CDM v5 (along with its web tools such as - Atlas, R and Achilles), and also _optionally_ import a vocabulary and/or data to get you started.
 
 ## Prerequisites
 
@@ -52,16 +52,54 @@ Take the [terraform.sample.tfvars](terraform/terraform.sample.tfvars), make a co
     - This could also be done using a `.tfvars` file.
 3. `terraform apply`
     - Provide similar input for `terraform plan` if not using a `.tfvars` file.
+4. BE PATIENT - it can take OHDSI WebAPI and Atlas ~5-10 minutes to boot up normally.
 
 **DISCLAIMER**: The execution of `terraform apply` can take about 45-60 minutes if importing the vocabulary set due to the size of the vocabulary csv files, which are often a total of a few gigabytes.
 
+**ANOTHER DISCLAIMER**: If you are able to access Atlas, but are seeing the following error:
+
+![Atlas configure sources](./docs/assets/atlas_config.png)
+
+This means that you have not given the deployment enough time to configure data sources for WebAPI. Please wait about 15 minutes, and if you are still seeing this error, you can configure the source manually:
+
+1. Connect to the SQL database. You can use various database IDEs like Azure Data Studio.
+2. Run the query in `../sql/source_sourcce_daimon.sql` against your database.
+3. Go to browser, and navigate to `https://{prefix}-{environment}-omop-broadsea.azurewebsites.net/WebAPI/source/refresh`.
+
+If you got to `http://{prefix}-{environment}-omop-broadsea.azurewebsites.net/atlas/#/configure`, you should now see a new source entry. Refresh Atlas, and you will no longer be prompted with the error.
+
 ## Vocabulary and Data Import
 
-You can also import the vocabulary outside of Terraform, which can drastically improve infrastructure deployment time. This is the recommended approach in case Terraform deployment errors out, and in which case, the state of the Terraform resource(s) may become "tainted". It may be challenging to resume the dedployment when this occurs, and you may need to start over (i.e. perform a terraform destroy and reapply).
+You can also import the vocabulary outside of Terraform, which can drastically improve infrastructure deployment time. This is the recommended approach in case Terraform deployment errors out, and in which case, the state of the Terraform resource(s) may become "tainted". It may be challenging to resume the deployment when this occurs, and you may need to start over (i.e. perform a terraform destroy and reapply).
 
-To run the vocabulary manually, use the script `vocab_import.sh` in the `\scripts` directory. You may need to modify the path to `CSV_FILES` to point to the path of your vocabulary csv files.
+To import the vocabulary and synthetic data manually, be sure to comment out the vocab and data import in the Terraform `main.tf` script (lines 153-156 and lines 163-166, respectively) and use the script `vocab_import.sh` and `synpuf_data_import.sh`, respectively, in the `\scripts` directory. You may need to modify the path to `CSV_FILES` to point to the path of your vocabulary csv files.
 
-The same can be done for importing data. Instead, refer to the `synpuf_data_import.sh` script.
+## Using Achilles
+
+1. Navigate to `http://{prefix}-{environment}-omop-webtools.azurewebsites.net/`.
+2. Provide username and password. By default, they should be:
+    username: ohdsi
+    password: ohsi
+3. Load Achilles library.
+4. Create a connection:
+
+    ```
+    connectionDetails <- createConnectionDetails(dbms = "sql server", server = "<prefix>-<environment>-omop-sql-server.database.windows.net:1433/<prefix>_<environment>_omop_db", user = "omop_admin", password = "<password>", port = 1433)
+    ```
+
+5. Run Achilles:
+
+    ```
+    achilles(connectionDetails = connectionDetails,
+              cdmDatabaseSchema = "yvonne_dev_omop_db.dbo",
+              resultsDatabaseSchema = "yvonne_dev_omop_db.webapi",
+              vocabDatabaseSchema = "yvonne_dev_omop_db.dbo",
+              sourceName = "OHDSI CDM V5 Database",
+              cdmVersion = 5.3,
+              numThreads = 1,
+              runHeel = FALSE,
+              outputFolder = "output")
+    ```
 
 ## Troubleshooting
 
@@ -87,7 +125,7 @@ If you have installed sqlcmd and bcp but you still run into a command not found 
 
 - [x] Package Tomcat Server, WebAPI, Atlas - Deploying docker container in Azure App Service
 - [x] Azure Key vault support for App Service secrets
-- [ ] R Server + Achilles
+- [x] R Server + Achilles
 - [ ] Implementation of CI/CD in Azure DevOps pipelines or Github Actions to build more custom Docker images (?)
 - [ ] ETL
 - [ ] Testing and managing multiple databases

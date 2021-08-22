@@ -151,9 +151,9 @@ resource "azurerm_mssql_database" "OHDSI-CDMV5" {
   }
 
   # import cdm v5 vocabulary
-  #provisioner "local-exec" {
-  #      command = "../scripts/vocab_import.sh ${var.prefix}-${var.environment}-omop-sql-server.database.windows.net ${var.prefix}_${var.environment}_omop_db omop_admin ${var.omop_password}"
-  #}
+  provisioner "local-exec" {
+        command = "../scripts/vocab_import.sh ${var.prefix}-${var.environment}-omop-sql-server.database.windows.net ${var.prefix}_${var.environment}_omop_db omop_admin ${var.omop_password}"
+  }
 
   # convert vocabulary table columns from varchar to date
   provisioner "local-exec" {
@@ -161,9 +161,9 @@ resource "azurerm_mssql_database" "OHDSI-CDMV5" {
   }
 
   # import synpuf data
-  #provisioner "local-exec" {
-  #      command = "../scripts/synpuf_data_import.sh ${var.prefix}-${var.environment}-omop-sql-server.database.windows.net ${var.prefix}_${var.environment}_omop_db omop_admin ${var.omop_password}"
-  #}
+  provisioner "local-exec" {
+        command = "../scripts/synpuf_data_import.sh ${var.prefix}-${var.environment}-omop-sql-server.database.windows.net ${var.prefix}_${var.environment}_omop_db omop_admin ${var.omop_password}"
+  }
 
   # add indices and primary keys
   provisioner "local-exec" {
@@ -208,10 +208,10 @@ resource "azurerm_app_service" "omop_broadsea" {
     "WEBAPI_WAR" =  "WebAPI-2.9.0.war"
     "WEBSITES_PORT" = "8080"
     "WEBSITES_CONTAINER_START_TIME_LIMIT" = "1800"
-    "WEBAPI_URL" = "https://${var.prefix}-${var.environment}-omop-appservice.azurewebsites.net:8080/"
+    //"WEBAPI_URL" = "https://${var.prefix}-${var.environment}-omop-broadsea.azurewebsites.net:8080/"
     "SQL_SERVER_NAME" = "${var.prefix}-${var.environment}-omop-sql-server.database.windows.net"
     "SQL_DB_NAME" = "${var.prefix}_${var.environment}_omop_db"
-    "WEBAPI_SOURCES" = "https://${var.prefix}-${var.environment}-omop-appservice.azurewebsites.net/WebAPI/source"
+    "WEBAPI_SOURCES" = "https://${var.prefix}-${var.environment}-omop-broadsea.azurewebsites.net/WebAPI/source"
     "OMOP_PASSWORD" = "@Microsoft.KeyVault(VaultName=${var.prefix}-${var.environment}-omop-kv;SecretName=omop-password;SecretVersion=${azurerm_key_vault_secret.password.version})"
     "env" = "webapi-mssql"
     "security_origin" = "*"
@@ -265,6 +265,7 @@ resource "azurerm_app_service" "omop_webtools" {
   }
 
   app_settings = {
+    "WEBSITES_PORT" = "8787"
     "USER" = "${var.webtools_user}"
     "PASSWORD" =  "${var.webtools_password}"
   }

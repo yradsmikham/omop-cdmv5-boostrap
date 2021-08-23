@@ -76,6 +76,8 @@ To import the vocabulary and synthetic data manually, be sure to comment out the
 
 ## Using Achilles
 
+Running the Achilles R package on your CDM database is currently a requirement in order to characterize the datasaet and generate results that can be consumed by Atlas Data Sources. To do this:
+
 1. Navigate to `http://{prefix}-{environment}-omop-webtools.azurewebsites.net/`.
 2. Provide username and password. By default, they should be:
     username: ohdsi
@@ -84,22 +86,26 @@ To import the vocabulary and synthetic data manually, be sure to comment out the
 4. Create a connection:
 
     ```
-    connectionDetails <- createConnectionDetails(dbms = "sql server", server = "<prefix>-<environment>-omop-sql-server.database.windows.net:1433/<prefix>_<environment>_omop_db", user = "omop_admin", password = "<password>", port = 1433)
+    connectionDetails <- createConnectionDetails(dbms = "sql server", connectionString = "jdbc:sqlserver://{prefix}-{environment}-omop-sql-server.database.windows.net:1433;database={prefix}_{environment}_omop_db;user=omop_admin@{prefix}-{environment}-omop-sql-server;password={password};encrypt=true;trustServerCertificate=false;hostNameInCertificate=*.database.windows.net;loginTimeout=30;", user = "omop_admin", password = {password})
     ```
 
 5. Run Achilles:
 
     ```
     achilles(connectionDetails = connectionDetails,
-              cdmDatabaseSchema = "yvonne_dev_omop_db.dbo",
-              resultsDatabaseSchema = "yvonne_dev_omop_db.webapi",
-              vocabDatabaseSchema = "yvonne_dev_omop_db.dbo",
+              cdmDatabaseSchema = "{databaseName}.{schema}",
+              resultsDatabaseSchema = "{databaseName}.{schema}",
+              vocabDatabaseSchema = "{databaseName}.{schema}",
               sourceName = "OHDSI CDM V5 Database",
               cdmVersion = 5.3,
               numThreads = 1,
               runHeel = FALSE,
               outputFolder = "output")
     ```
+
+If you navigate to Atlas Data Sources, you should be able to see reports for the drop down menu items:
+
+![Atlas Data Sources](./docs/assets/atlas_data_sources.png)
 
 ## Troubleshooting
 
@@ -121,12 +127,16 @@ This message is in regards to the `omop_db_size`. If you are having problems wit
 
 If you have installed sqlcmd and bcp but you still run into a command not found error it may be because you do not have a proper symlink created. See [this page](https://sqlserveronlinuxbackup.com/sqlcmd-command-not-found-ubuntu/) on how to fix this issue.
 
+### r: Error executing SQL: com.microsoft.sqlserver.jdbc.SQLServerException: Incorrect syntax near 'analysis_id'. An error report has been created at  /home/ohdsi/errorReport.txt Error in rJava::.jcall(metaData, "Ljava/sql/ResultSet;", "getCatalogs") : com.microsoft.sqlserver.jdbc.SQLServerException: Connection reset
+
+You may see this error message in R when you attempt to load the Achilles function described in [Using Achilles](https://github.com/yradsmikham/omop-cdmv5-boostrap#using-achilles). Because the syntax “drop index if exists” doesn’t work for all OHDSI SQL platforms, when the “drop index” step fails if you do not already have an index, it throws an error message. For now, this is a harmless error. Similar to a bug described [here](https://github.com/OHDSI/Achilles/issues/461).
+
 ## Footnotes
 
 - [x] Package Tomcat Server, WebAPI, Atlas - Deploying docker container in Azure App Service
 - [x] Azure Key vault support for App Service secrets
 - [x] R Server + Achilles
-- [ ] Implementation of CI/CD in Azure DevOps pipelines or Github Actions to build more custom Docker images (?)
+- [ ] Implementation of CI/CD in Azure DevOps pipelines to build custom Docker images
 - [ ] ETL
 - [ ] Testing and managing multiple databases
 - [ ] Observability

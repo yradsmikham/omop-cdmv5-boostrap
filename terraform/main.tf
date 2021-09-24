@@ -150,6 +150,12 @@ resource "azurerm_mssql_database" "OHDSI-CDMV5" {
         command = "sqlcmd -U omop_admin -P ${var.omop_password} -S ${var.prefix}-${var.environment}-omop-sql-server.database.windows.net -d ${var.prefix}_${var.environment}_omop_db -i '../sql/OMOP_CDM_sql_server_ddl.sql' -o ${var.log_file}"
   }
 
+  # optionally create staging tables to aid in loading clinical data into the CDM
+  /*
+  provisioner "local-exec" {
+        command = "sqlcmd -U omop_admin -P ${var.omop_password} -S ${var.prefix}-${var.environment}-omop-sql-server.database.windows.net -d ${var.prefix}_${var.environment}_omop_db -i '../sql/OMOP_CDM_sql_server_staging_ddl.sql' -o ${var.log_file}"
+  }
+
   # import cdm v5 vocabulary
   provisioner "local-exec" {
         command = "../scripts/vocab_import.sh ${var.prefix}-${var.environment}-omop-sql-server.database.windows.net ${var.prefix}_${var.environment}_omop_db omop_admin ${var.omop_password}"

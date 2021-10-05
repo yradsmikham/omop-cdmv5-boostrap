@@ -74,6 +74,10 @@ You can also import the vocabulary outside of Terraform, which can drastically i
 
 To import the vocabulary and synthetic data manually, be sure to comment out the vocab and data import in the Terraform `main.tf` script (lines 153-156 and lines 163-166, respectively) and use the script `vocab_import.sh` and `synpuf_data_import.sh`, respectively, in the `\scripts` directory. You may need to modify the path to `CSV_FILES` to point to the path of your vocabulary csv files.
 
+### Loading Clinical Data 
+
+[Staging Tables SQL Script](./sql/OMOP_CDM_sql_server_staging_ddl_indexes.sql) is currently executed in the Terraform to aid in loading clinical data into the OMOP CDM database, where, new clinical data can be added to the target staging table and eventually migrated to the permanent clinical table using a SQL Stored Procedure or an alternative approach. You can comment out this import in the Terraform `main.tf` script (lines 154-156) if this isn't desired. 
+
 ## Using Achilles
 
 Running the Achilles R package on your CDM database is currently a requirement in order to characterize the datasaet and generate results that can be consumed by Atlas Data Sources. To do this:

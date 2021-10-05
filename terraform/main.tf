@@ -150,11 +150,24 @@ resource "azurerm_mssql_database" "OHDSI-CDMV5" {
         command = "sqlcmd -U omop_admin -P ${var.omop_password} -S ${var.prefix}-${var.environment}-omop-sql-server.database.windows.net -d ${var.prefix}_${var.environment}_omop_db -i '../sql/OMOP_CDM_sql_server_ddl.sql' -o ${var.log_file}"
   }
 
-  # optionally create staging tables to aid in loading clinical data into the CDM
+  # optionally create staging tables and SPROCs to aid in loading clinical data into the CDM
   /*
   provisioner "local-exec" {
         command = "sqlcmd -U omop_admin -P ${var.omop_password} -S ${var.prefix}-${var.environment}-omop-sql-server.database.windows.net -d ${var.prefix}_${var.environment}_omop_db -i '../sql/OMOP_CDM_sql_server_staging_ddl.sql' -o ${var.log_file}"
   }
+
+  provisioner "local-exec" {
+        command = "sqlcmd -U omop_admin -P ${var.omop_password} -S ${var.prefix}-${var.environment}-omop-sql-server.database.windows.net -d ${var.prefix}_${var.environment}_omop_db -i '../sql/SPROC_add_indexes_constraints.sql' -o ${var.log_file}"
+  }
+
+  provisioner "local-exec" {
+        command = "sqlcmd -U omop_admin -P ${var.omop_password} -S ${var.prefix}-${var.environment}-omop-sql-server.database.windows.net -d ${var.prefix}_${var.environment}_omop_db -i '../sql/SPROC_remove_indexes_constraints.sql' -o ${var.log_file}"
+  }
+
+  provisioner "local-exec" {
+        command = "sqlcmd -U omop_admin -P ${var.omop_password} -S ${var.prefix}-${var.environment}-omop-sql-server.database.windows.net -d ${var.prefix}_${var.environment}_omop_db -i '../sql/SPROC_move_data_to_permanent_tables.sql' -o ${var.log_file}"
+  }
+  */
 
   # import cdm v5 vocabulary
   provisioner "local-exec" {

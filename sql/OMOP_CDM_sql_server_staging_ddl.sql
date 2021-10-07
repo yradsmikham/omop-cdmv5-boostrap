@@ -63,11 +63,3 @@ Standardized derived elements
 SELECT TOP 0 * INTO dbo.staging_condition_era FROM dbo.condition_era;
 
 SELECT TOP 0 * INTO dbo.staging_drug_era FROM dbo.drug_era;
-
-
-/************************
-
-Helper Table to move data from staging tables to permanent tables
-
-************************/
-CREATE TABLE watermark_copy_staging_tables (table_name VARCHAR(MAX))

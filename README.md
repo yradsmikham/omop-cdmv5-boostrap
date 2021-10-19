@@ -76,7 +76,7 @@ To import the vocabulary and synthetic data manually, be sure to comment out the
 
 ### Loading Clinical Data 
 
-[Staging Tables SQL Script](./sql/OMOP_CDM_sql_server_staging_ddl_indexes.sql) is currently executed in the Terraform to aid in loading clinical data into the OMOP CDM database, where, new clinical data can be added to the target staging table and eventually migrated to the permanent clinical table using a SQL Stored Procedure or an alternative approach. You can comment out this import in the Terraform `main.tf` script (lines 154-156) if this isn't desired. 
+[Staging Tables SQL Script](./sql/OMOP_CDM_sql_server_staging_ddl_indexes.sql) is currently executed in the Terraform to aid in loading clinical data into the OMOP CDM database, where, new clinical data can be added to the target staging table and eventually migrated to the permanent clinical table using a [SQL Stored Procedure](./sql/SPROC_move_data_to_permanent_tables.sql) or an alternative approach. You can comment out this import in the Terraform `main.tf` script (lines 154-156) if this isn't desired. 
 
 ## Using Achilles
 

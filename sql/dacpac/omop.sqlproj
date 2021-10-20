@@ -130,5 +130,6 @@
     <Build Include="dbo\StoredProcedures\remove_indexes_constraints.sql" />
     <Build Include="dbo\StoredProcedures\move_data_to_permanent_tables.sql" />
     <Build Include="dbo\StoredProcedures\add_indexes_constraints.sql" />
+    <Build Include="dbo\StoredProcedures\test_move_data_to_permanent_tables.sql" />
   </ItemGroup>
 </Project>

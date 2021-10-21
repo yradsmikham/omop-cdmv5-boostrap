@@ -1,6 +1,13 @@
 CREATE PROCEDURE add_indexes_constraints
 AS
 BEGIN
+    DECLARE @log_date AS NVARCHAR(50);
+    DECLARE @log_message NVARCHAR(512);
+
+    SET @log_date = CONVERT(NVARCHAR(50),GETDATE(),121);
+    SET @log_message = @log_date + ' add_indexes_constraints is starting execution'
+    RAISERROR (@log_message, 0, 1) WITH NOWAIT
+
     -- add indices and primary keys
     /*********************************************************************************
     # Copyright 2014 Observational Health Data Sciences and Informatics
@@ -714,5 +721,9 @@ BEGIN
     ************************/
 
     ALTER TABLE concept_synonym ADD CONSTRAINT uq_concept_synonym UNIQUE (concept_id, concept_synonym_name, language_concept_id);
+
+    SET @log_date = CONVERT(NVARCHAR(50),GETDATE(),121);
+    SET @log_message = @log_date + ' add_indexes_constraints is ending execution'
+    RAISERROR (@log_message, 0, 1) WITH NOWAIT
 END
 

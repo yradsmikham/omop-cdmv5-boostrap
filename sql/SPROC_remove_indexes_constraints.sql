@@ -1,6 +1,12 @@
 CREATE PROCEDURE remove_indexes_constraints
 AS
 BEGIN
+        DECLARE @log_date AS NVARCHAR(50);
+        DECLARE @log_message NVARCHAR(512);
+
+        SET @log_date = CONVERT(NVARCHAR(50),GETDATE(),121);
+        SET @log_message = @log_date + ' remove_indexes_constraints is starting execution'
+        RAISERROR (@log_message, 0, 1) WITH NOWAIT
         -- add foreign key constraints
 
         /*********************************************************************************
@@ -713,4 +719,8 @@ BEGIN
 
         DROP INDEX  idx_condition_era_person_id ON condition_era;
         DROP INDEX  idx_condition_era_concept_id ON condition_era;
+
+        SET @log_date = CONVERT(NVARCHAR(50),GETDATE(),121);
+        SET @log_message = @log_date + ' remove_indexes_constraints is ending execution'
+        RAISERROR (@log_message, 0, 1) WITH NOWAIT
 END

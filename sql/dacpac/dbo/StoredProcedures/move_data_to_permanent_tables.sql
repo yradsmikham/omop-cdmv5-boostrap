@@ -1,5 +1,8 @@
 CREATE PROCEDURE move_data_to_permanent_tables @watermark_table NVARCHAR(100)
 AS
+    -- SET XACT_ABORT ON will cause the transaction to be uncommittable  
+    -- when the constraint violation occurs.   
+    SET XACT_ABORT ON; 
     BEGIN TRY
         BEGIN TRANSACTION move_data_to_permanent_tables
         
@@ -13,6 +16,9 @@ AS
         SET @log_message = @log_date + ' move_data_to_permanent_tables is starting execution'
         RAISERROR (@log_message, 0, 1) WITH NOWAIT
 
+        SET @log_date = CONVERT(NVARCHAR(50),GETDATE(),121);
+        SET @log_message = @log_date + ' move_data_to_permanent_tables is removing all indexes and constraints on OMOP tables'
+        RAISERROR (@log_message, 0, 1) WITH NOWAIT
         
         EXEC dbo.remove_indexes_constraints;
         SET @log_date = CONVERT(NVARCHAR(50),GETDATE(),121);
@@ -55,6 +61,9 @@ AS
         SET @log_message = @log_date + ' move_data_to_permanent_tables moved all data from staging for tables in ' + @watermark_table
         RAISERROR (@log_message, 0, 1) WITH NOWAIT
         
+        SET @log_date = CONVERT(NVARCHAR(50),GETDATE(),121);
+        SET @log_message = @log_date + ' move_data_to_permanent_tables is applying all indexes and constraints on OMOP tables'
+        RAISERROR (@log_message, 0, 1) WITH NOWAIT
         EXEC dbo.add_indexes_constraints;
         SET @log_date = CONVERT(NVARCHAR(50),GETDATE(),121);
         SET @log_message = @log_date + ' move_data_to_permanent_tables applied all indexes and constraints on OMOP tables'
@@ -67,6 +76,10 @@ AS
     END TRY
     BEGIN CATCH
 
+        SET @log_date = CONVERT(NVARCHAR(50),GETDATE(),121);
+        SET @log_message = @log_date + ' move_data_to_permanent_tables entered catch block'
+        RAISERROR (@log_message, 0, 1) WITH NOWAIT
+
         IF (SELECT CURSOR_STATUS('global','omop_tables_cursor')) >= -1
         BEGIN
         DEALLOCATE omop_tables_cursor;
@@ -74,11 +87,16 @@ AS
 
         -- Transaction uncommittable
         IF (XACT_STATE()) = -1
+        SET @log_date = CONVERT(NVARCHAR(50),GETDATE(),121);
+        SET @log_message = @log_date + ' move_data_to_permanent_tables is rolling back transaction'
+        RAISERROR (@log_message, 0, 1) WITH NOWAIT
         ROLLBACK TRANSACTION move_data_to_permanent_tables;
         
-    
         -- Transaction committable
         IF (XACT_STATE()) = 1
+        SET @log_date = CONVERT(NVARCHAR(50),GETDATE(),121);
+        SET @log_message = @log_date + ' move_data_to_permanent_tables is committing transaction'
+        RAISERROR (@log_message, 0, 1) WITH NOWAIT
         COMMIT TRANSACTION move_data_to_permanent_tables;
 
         THROW;

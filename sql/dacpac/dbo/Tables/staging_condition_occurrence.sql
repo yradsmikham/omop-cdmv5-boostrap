@@ -16,7 +16,3 @@ CREATE TABLE [dbo].[staging_condition_occurrence] (
     [condition_status_source_value] VARCHAR (50)  NULL,
     [condition_status_concept_id]   INT           NULL
 );
-
-
-GO
-

@@ -15,24 +15,5 @@ CREATE TABLE [dbo].[visit_occurrence] (
     [admitting_source_value]        VARCHAR (50)  NULL,
     [discharge_to_concept_id]       INT           NULL,
     [discharge_to_source_value]     VARCHAR (50)  NULL,
-    [preceding_visit_occurrence_id] INT           NULL,
-    CONSTRAINT [xpk_visit_occurrence] PRIMARY KEY NONCLUSTERED ([visit_occurrence_id] ASC),
-    CONSTRAINT [fpk_visit_concept_s] FOREIGN KEY ([visit_source_concept_id]) REFERENCES [dbo].[concept] ([concept_id]),
-    CONSTRAINT [fpk_visit_preceding] FOREIGN KEY ([preceding_visit_occurrence_id]) REFERENCES [dbo].[visit_occurrence] ([visit_occurrence_id])
+    [preceding_visit_occurrence_id] INT           NULL
 );
-
-
-GO
-
-CREATE CLUSTERED INDEX [idx_visit_person_id]
-    ON [dbo].[visit_occurrence]([person_id] ASC);
-
-
-GO
-
-CREATE NONCLUSTERED INDEX [idx_visit_concept_id]
-    ON [dbo].[visit_occurrence]([visit_concept_id] ASC);
-
-
-GO
-

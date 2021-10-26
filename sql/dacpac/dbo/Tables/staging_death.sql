@@ -7,7 +7,3 @@ CREATE TABLE [dbo].[staging_death] (
     [cause_source_value]      VARCHAR (50)  NULL,
     [cause_source_concept_id] INT           NULL
 );
-
-
-GO
-

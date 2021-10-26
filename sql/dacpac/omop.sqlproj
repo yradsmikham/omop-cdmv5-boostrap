@@ -71,26 +71,48 @@
     <Delete Files="$(BaseIntermediateOutputPath)\project.assets.json" />
   </Target>
   <ItemGroup>
-    <Build Include="dbo\Tables\vocabulary.sql" />
-    <Build Include="dbo\Tables\visit_occurrence.sql" />
+  
     <Build Include="dbo\Tables\staging_visit_occurrence.sql" />
+    <Build Include="dbo\Tables\staging_visit_detail.sql" />
+    <Build Include="dbo\Tables\staging_specimen.sql" />
+    <Build Include="dbo\Tables\staging_source_to_concept_map.sql" />
+    <Build Include="dbo\Tables\staging_relationship.sql" />
     <Build Include="dbo\Tables\staging_provider.sql" />
     <Build Include="dbo\Tables\staging_procedure_occurrence.sql" />
     <Build Include="dbo\Tables\staging_person.sql" />
     <Build Include="dbo\Tables\staging_payer_plan_period.sql" />
-    <Build Include="dbo\Tables\staging_observation_period.sql" />
     <Build Include="dbo\Tables\staging_observation.sql" />
+    <Build Include="dbo\Tables\staging_observation_period.sql" />
+    <Build Include="dbo\Tables\staging_note.sql" />
+    <Build Include="dbo\Tables\staging_note_nlp.sql" />
+    <Build Include="dbo\Tables\staging_metadata.sql" />
     <Build Include="dbo\Tables\staging_measurement.sql" />
     <Build Include="dbo\Tables\staging_location.sql" />
+    <Build Include="dbo\Tables\staging_fact_relationship.sql" />
+    <Build Include="dbo\Tables\staging_drug_strength.sql" />
     <Build Include="dbo\Tables\staging_drug_exposure.sql" />
     <Build Include="dbo\Tables\staging_drug_era.sql" />
+    <Build Include="dbo\Tables\staging_dose_era.sql" />
+    <Build Include="dbo\Tables\staging_domain.sql" />
     <Build Include="dbo\Tables\staging_device_exposure.sql" />
     <Build Include="dbo\Tables\staging_death.sql" />
     <Build Include="dbo\Tables\staging_cost.sql" />
     <Build Include="dbo\Tables\staging_condition_occurrence.sql" />
     <Build Include="dbo\Tables\staging_condition_era.sql" />
+    <Build Include="dbo\Tables\staging_concept.sql" />
+    <Build Include="dbo\Tables\staging_concept_synonym.sql" />
+    <Build Include="dbo\Tables\staging_concept_relationship.sql" />
+    <Build Include="dbo\Tables\staging_concept_class.sql" />
+    <Build Include="dbo\Tables\staging_concept_ancestor.sql" />
+    <Build Include="dbo\Tables\staging_cohort.sql" />
+    <Build Include="dbo\Tables\staging_cohort_definition.sql" />
+    <Build Include="dbo\Tables\staging_cohort_attribute.sql" />
     <Build Include="dbo\Tables\staging_cdm_source.sql" />
     <Build Include="dbo\Tables\staging_care_site.sql" />
+    <Build Include="dbo\Tables\staging_attribute_definition.sql" />
+    <Build Include="dbo\Tables\vocabulary.sql" />
+    <Build Include="dbo\Tables\visit_occurrence.sql" />
+    <Build Include="dbo\Tables\visit_detail.sql" />
     <Build Include="dbo\Tables\specimen.sql" />
     <Build Include="dbo\Tables\source_to_concept_map.sql" />
     <Build Include="dbo\Tables\relationship.sql" />
@@ -98,10 +120,11 @@
     <Build Include="dbo\Tables\procedure_occurrence.sql" />
     <Build Include="dbo\Tables\person.sql" />
     <Build Include="dbo\Tables\payer_plan_period.sql" />
-    <Build Include="dbo\Tables\observation_period.sql" />
     <Build Include="dbo\Tables\observation.sql" />
-    <Build Include="dbo\Tables\note_nlp.sql" />
+    <Build Include="dbo\Tables\observation_period.sql" />
     <Build Include="dbo\Tables\note.sql" />
+    <Build Include="dbo\Tables\note_nlp.sql" />
+    <Build Include="dbo\Tables\metadata.sql" />
     <Build Include="dbo\Tables\measurement.sql" />
     <Build Include="dbo\Tables\location.sql" />
     <Build Include="dbo\Tables\fact_relationship.sql" />
@@ -115,14 +138,14 @@
     <Build Include="dbo\Tables\cost.sql" />
     <Build Include="dbo\Tables\condition_occurrence.sql" />
     <Build Include="dbo\Tables\condition_era.sql" />
+    <Build Include="dbo\Tables\concept.sql" />
     <Build Include="dbo\Tables\concept_synonym.sql" />
     <Build Include="dbo\Tables\concept_relationship.sql" />
     <Build Include="dbo\Tables\concept_class.sql" />
     <Build Include="dbo\Tables\concept_ancestor.sql" />
-    <Build Include="dbo\Tables\concept.sql" />
+    <Build Include="dbo\Tables\cohort.sql" />
     <Build Include="dbo\Tables\cohort_definition.sql" />
     <Build Include="dbo\Tables\cohort_attribute.sql" />
-    <Build Include="dbo\Tables\cohort.sql" />
     <Build Include="dbo\Tables\clinical_metadata.sql" />
     <Build Include="dbo\Tables\cdm_source.sql" />
     <Build Include="dbo\Tables\care_site.sql" />
@@ -130,9 +153,5 @@
     <Build Include="dbo\StoredProcedures\remove_indexes_constraints.sql" />
     <Build Include="dbo\StoredProcedures\move_data_to_permanent_tables.sql" />
     <Build Include="dbo\StoredProcedures\add_indexes_constraints.sql" />
-    <Build Include="dbo\StoredProcedures\test_move_data_to_permanent_tables.sql" />
-  </ItemGroup>
-  <ItemGroup>
-    <PostDeploy Include="Scripts\Script.PostDeployment.sql" />
   </ItemGroup>
 </Project>

@@ -17,7 +17,3 @@ CREATE TABLE [dbo].[staging_visit_occurrence] (
     [discharge_to_source_value]     VARCHAR (50)  NULL,
     [preceding_visit_occurrence_id] INT           NULL
 );
-
-
-GO
-

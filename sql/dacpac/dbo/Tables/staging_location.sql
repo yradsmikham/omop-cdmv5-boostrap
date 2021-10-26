@@ -9,6 +9,3 @@ CREATE TABLE [dbo].[staging_location] (
     [location_source_value] VARCHAR (50) NULL
 );
 
-
-GO
-

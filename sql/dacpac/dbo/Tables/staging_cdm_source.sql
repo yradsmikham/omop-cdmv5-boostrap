@@ -11,6 +11,3 @@ CREATE TABLE [dbo].[staging_cdm_source] (
     [vocabulary_version]             VARCHAR (20)  NULL
 );
 
-
-GO
-

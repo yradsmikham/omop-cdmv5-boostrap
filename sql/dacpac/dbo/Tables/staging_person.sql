@@ -18,7 +18,3 @@ CREATE TABLE [dbo].[staging_person] (
     [ethnicity_source_value]      VARCHAR (50)  NULL,
     [ethnicity_source_concept_id] INT           NULL
 );
-
-
-GO
-

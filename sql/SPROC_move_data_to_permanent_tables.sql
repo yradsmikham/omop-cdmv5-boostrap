@@ -2,15 +2,18 @@ CREATE PROCEDURE move_data_to_permanent_tables @watermark_table NVARCHAR(100)
 AS
     -- SET XACT_ABORT ON will cause the transaction to be uncommittable  
     -- when the constraint violation occurs.   
-    SET XACT_ABORT ON; 
+    SET XACT_ABORT ON;
+    BEGIN TRANSACTION move_data_to_permanent_tables
     BEGIN TRY
-        BEGIN TRANSACTION move_data_to_permanent_tables
-        
         DECLARE @current_table_name VARCHAR(MAX);
         DECLARE @staging_table_name VARCHAR(MAX);
         DECLARE @log_date AS NVARCHAR(50);
         DECLARE @log_message NVARCHAR(512);
         SET @current_table_name = ''
+
+        -- The use of RAISERROR with the NOWAIT option shouldn't actually be emitting an exception as you might expect.  It's used
+        -- to immediately emmit log/console messages.  For additional details, see
+        -- https://www.mssqltips.com/sqlservertip/1660/using-the-nowait-option-with-the-sql-server-raiserror-statement/
 
         SET @log_date = CONVERT(NVARCHAR(50),GETDATE(),121);
         SET @log_message = @log_date + ' move_data_to_permanent_tables is starting execution'
@@ -19,7 +22,7 @@ AS
         SET @log_date = CONVERT(NVARCHAR(50),GETDATE(),121);
         SET @log_message = @log_date + ' move_data_to_permanent_tables is removing all indexes and constraints on OMOP tables'
         RAISERROR (@log_message, 0, 1) WITH NOWAIT
-
+        
         EXEC dbo.remove_indexes_constraints;
         SET @log_date = CONVERT(NVARCHAR(50),GETDATE(),121);
         SET @log_message = @log_date + ' move_data_to_permanent_tables removed all indexes and constraints on OMOP tables'
@@ -28,7 +31,7 @@ AS
         DECLARE @cursor_sql VARCHAR(MAX)
         SET @cursor_sql = 'DECLARE omop_tables_cursor CURSOR FOR SELECT table_name FROM ' + @watermark_table
         EXEC(@cursor_sql)
-
+        
         SET @log_date = CONVERT(NVARCHAR(50),GETDATE(),121);
         SET @log_message = @log_date + ' move_data_to_permanent_tables is moving data for tables in ' + @watermark_table
         RAISERROR (@log_message, 0, 1) WITH NOWAIT
@@ -82,24 +85,27 @@ AS
 
         IF (SELECT CURSOR_STATUS('global','omop_tables_cursor')) >= -1
         BEGIN
-        DEALLOCATE omop_tables_cursor;
+            DEALLOCATE omop_tables_cursor;
         END
 
         -- Transaction uncommittable
         IF (XACT_STATE()) = -1
-        SET @log_date = CONVERT(NVARCHAR(50),GETDATE(),121);
-        SET @log_message = @log_date + ' move_data_to_permanent_tables is rolling back transaction'
-        RAISERROR (@log_message, 0, 1) WITH NOWAIT
-        ROLLBACK TRANSACTION move_data_to_permanent_tables;
-    
+        BEGIN
+            SET @log_date = CONVERT(NVARCHAR(50),GETDATE(),121);
+            SET @log_message = @log_date + ' move_data_to_permanent_tables is rolling back transaction'
+            RAISERROR (@log_message, 0, 1) WITH NOWAIT
+            ROLLBACK TRANSACTION move_data_to_permanent_tables;
+            THROW;
+        END
         -- Transaction committable
         IF (XACT_STATE()) = 1
-        SET @log_date = CONVERT(NVARCHAR(50),GETDATE(),121);
-        SET @log_message = @log_date + ' move_data_to_permanent_tables is committing transaction'
-        RAISERROR (@log_message, 0, 1) WITH NOWAIT
-        COMMIT TRANSACTION move_data_to_permanent_tables;
-
-        THROW;
+        BEGIN
+            SET @log_date = CONVERT(NVARCHAR(50),GETDATE(),121);
+            SET @log_message = @log_date + ' move_data_to_permanent_tables is committing transaction'
+            RAISERROR (@log_message, 0, 1) WITH NOWAIT
+            COMMIT TRANSACTION move_data_to_permanent_tables;
+        END
 
     END CATCH;
 
+GO

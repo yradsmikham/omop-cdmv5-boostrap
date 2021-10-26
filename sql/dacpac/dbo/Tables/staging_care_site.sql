@@ -6,7 +6,3 @@ CREATE TABLE [dbo].[staging_care_site] (
     [care_site_source_value]        VARCHAR (50)  NULL,
     [place_of_service_source_value] VARCHAR (50)  NULL
 );
-
-
-GO
-

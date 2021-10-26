@@ -13,7 +13,3 @@ CREATE TABLE [dbo].[staging_provider] (
     [gender_source_value]         VARCHAR (50)  NULL,
     [gender_source_concept_id]    INT           NULL
 );
-
-
-GO
-

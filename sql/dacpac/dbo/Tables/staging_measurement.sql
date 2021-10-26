@@ -20,7 +20,3 @@ CREATE TABLE [dbo].[staging_measurement] (
     [unit_source_value]             VARCHAR (50)  NULL,
     [value_source_value]            VARCHAR (50)  NULL
 );
-
-
-GO
-

@@ -23,6 +23,3 @@ CREATE TABLE [dbo].[staging_cost] (
     [drg_source_value]         VARCHAR (3)  NULL
 );
 
-
-GO
-

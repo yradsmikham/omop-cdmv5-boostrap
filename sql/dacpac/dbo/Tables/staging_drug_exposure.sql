@@ -23,7 +23,3 @@ CREATE TABLE [dbo].[staging_drug_exposure] (
     [route_source_value]           VARCHAR (50)  NULL,
     [dose_unit_source_value]       VARCHAR (50)  NULL
 );
-
-
-GO
-

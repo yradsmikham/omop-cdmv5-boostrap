@@ -15,6 +15,3 @@ CREATE TABLE [dbo].[staging_procedure_occurrence] (
     [modifier_source_value]       VARCHAR (50)  NULL
 );
 
-
-GO
-

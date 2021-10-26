@@ -17,5 +17,3 @@ CREATE TABLE [dbo].[staging_device_exposure] (
 );
 
 
-GO
-

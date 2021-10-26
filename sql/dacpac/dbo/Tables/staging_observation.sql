@@ -18,7 +18,3 @@ CREATE TABLE [dbo].[staging_observation] (
     [unit_source_value]             VARCHAR (50)  NULL,
     [qualifier_source_value]        VARCHAR (50)  NULL
 );
-
-
-GO
-

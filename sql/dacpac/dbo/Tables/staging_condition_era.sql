@@ -6,7 +6,3 @@ CREATE TABLE [dbo].[staging_condition_era] (
     [condition_era_end_date]     DATE NOT NULL,
     [condition_occurrence_count] INT  NULL
 );
-
-
-GO
-

@@ -7,7 +7,3 @@ CREATE TABLE [dbo].[staging_drug_era] (
     [drug_exposure_count] INT  NULL,
     [gap_days]            INT  NULL
 );
-
-
-GO
-
